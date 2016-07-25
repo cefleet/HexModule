@@ -1,11 +1,9 @@
 #include "HexGrid.h"
 #include <cmath>
 #include <algorithm>
-//#include <string>
 using std::abs;
 using std::max;
-//using std::string;
-//using std::to_string;
+
 
 HexGrid::HexGrid(){
   rows = 10;
@@ -209,10 +207,6 @@ Array HexGrid::hex_linedraw(Vector3 a, Vector3 b)
     return results;
 }
 
-Array HexGrid::get_directions(){
-  return hex_directions;
-}
-
 Vector2 HexGrid::hex_to_point(Vector3 h)
 {
     double x = (double(orient["f0"]) * h.x + double(orient["f1"]) * h.y) * size.x;
@@ -240,7 +234,7 @@ Array HexGrid::hex_corners(Vector3 h)
 {
     Array corners;
     Vector2 center = hex_to_point(h);
-    for (int i = 0; i < 6; i++)
+    for (int i = 1; i < 7; i++)
     {
         Vector2 offset = hex_corner_offset(i);
         corners.push_back(Vector2(center.x + offset.x, center.y + offset.y));
@@ -259,7 +253,7 @@ Array HexGrid::hex_edges(Vector3 hex){
     Array edge;
     edge.push_back(corners[l]);
     edge.push_back(corners[i]);
-		edges.append(edge);
+		edges.push_back(edge);
   }
 	return edges;
 }
@@ -283,7 +277,7 @@ Array HexGrid::hexes_within_distance(Vector3 hex,int dist)
 {
     Array results;
     results.push_back(hex);
-    for (int i = 1; i <= dist; i++){
+    for (int i = 1; i < dist; i++){
       Array subR = hexes_at_distance(hex,i);
       for (int j = 0; j < subR.size(); j++){
         results.push_back(subR[j]);
@@ -419,9 +413,140 @@ Array HexGrid::get_map(){
   return hex_map;
 }
 
+Array HexGrid::astar_get_path_to(Vector3 startHex, Vector3 endHex, Array obstacles, int dist){
+  int lowInd = 0;
+  Dictionary currentNode;
+  Dictionary curr;
+  Dictionary neighbor;
+  Array neighbors;
+  Array openList;
+  Array closedList;
+  Array ret;
+  int n;
+  int gScore;
+  bool gScoreIsBest;
+  bool isClosed;
+  bool isObstacle;
+  bool visited;
+
+  for(int i = 0; i < astar_grid.size(); i++){
+    _astar_reset_Nhex(i);
+  }
+
+
+
+  openList.push_back(startHex);
+
+  while(openList.size() > 0){
+    lowInd = 0;
+    for(int i = 0; i < openList.size(); i++){
+      if(openList[i]["f"] < openList[lowInd]["f"]){
+        lowInd = i;
+      }
+    }
+    currentNode = openList[lowInd];
+    if(currentNode["id"] == endHex){
+      while(curr["parent"]){
+        ret.push_back(curr);
+        curr = curr["parent"];
+      }
+      //i may need to invert the path here
+      return ret;
+    }
+    openList.remove(lowInd);
+    currentNode["closed"] = true;
+    neighbors = currentNode["neighbors"];
+    for(int i = 0; i < neighbors.size(); i++){
+      //this could error out possibly
+      n = astar_grid.find(neighbors[i]);
+      if(n > -1){
+        neighbor = astar_grid[n];
+        isClosed = neighbor["closed"];
+        isObstacle = neighbor["isObstacle"];
+        visited = neighbor["visited"];
+
+        if(neighbor.size() > 2 && isClosed == false && isObstacle == false ){
+          gScore = float(currentNode["g"]) + 1;
+          gScoreIsBest = false;
+          if(visited == false){
+              gScoreIsBest = true;
+              neighbor["h"] = hex_distance(neighbor["id"], endHex);
+              neighbor["visited"] = true;
+              openList.push_back(neighbor);
+          } else if (gScore < double(neighbor["g"])){
+            gScoreIsBest = true;
+          }
+
+          if(gScoreIsBest){
+            neighbor["parent"] = currentNode;
+            neighbor["g"] = gScore;
+            neighbor["f"] = double(neighbor["g"])+double(neighbor["h"]);
+          }
+        }
+      }
+    }
+
+  }
+
+  return ret;
+
+}
+
+//the ranglist is a list of all the tiles or the possible tiles to get to
+void HexGrid::astar_grid_setup(Array obstacles, Array rangeList){
+    astar_grid.clear();
+    for (int i=0; i < rangeList.size(); i++){
+      Dictionary nHex = _astar_gridify_hex(rangeList[i]);
+			for(int o = 0; o < obstacles.size(); o++){
+        if (obstacles[o] == nHex){
+          nHex["isObstacle"] = true;
+        }
+      }
+      astar_grid.push_back(nHex);
+    }
+}
+
+void HexGrid::_astar_reset_Nhex(int index){
+  //this is probably wrong ... I should be using pointers or something
+  Dictionary i = astar_grid[index];
+  i["f"] = 0;
+  i["g"] = 0;
+	i["h"] = 0;
+	i["debug"] = "";
+	i["parent"] = false;
+	i["closed"] = false;
+	i["visited"] = false;
+
+  astar_grid[index] = i;
+
+}
+
+Dictionary HexGrid::_astar_gridify_hex(Vector3 hex){
+  Dictionary nHex;
+  //this is ghetto but I cannot seem to use normal ways for converting numbers to strings so I'm just going to use the vector for the id until I figure it out
+  nHex["id"] = hex;
+  if(hex_map.find(hex) > -1){
+    nHex["neighbors"] = hex_neighbors(hex);//engine._neighbors(hGrid.map[hex])
+		nHex["q"] = hex.x;
+		nHex["r"] = hex.y;
+		nHex["s"] = hex.z;
+		nHex["f"] = 0;
+		nHex["g"] = 0;
+		nHex["h"] = 0;
+	//	nHex.debug = ""
+		nHex["parent"] = 0;
+		nHex["isObstacle"] = false;
+		nHex["closed"] = false;
+		nHex["visited"] = false;
+  }
+  return nHex;
+}
+
 void HexGrid::_bind_methods() {
     ObjectTypeDB::bind_method("set_rows",&HexGrid::set_rows);
     ObjectTypeDB::bind_method("set_cols",&HexGrid::set_cols);
+    ObjectTypeDB::bind_method("set_layout",&HexGrid::set_layout);
+
     ObjectTypeDB::bind_method("hex",&HexGrid::hex);
     ObjectTypeDB::bind_method("point",&HexGrid::point);
     ObjectTypeDB::bind_method("hex_add",&HexGrid::hex_add);
@@ -443,6 +568,7 @@ void HexGrid::_bind_methods() {
     ObjectTypeDB::bind_method("get_map",&HexGrid::get_map);
 
     ObjectTypeDB::bind_method("line_intersect_hex",&HexGrid::line_intersect_hex);
+    ObjectTypeDB::bind_method("lines_intersect",&HexGrid::lines_intersect);
     ObjectTypeDB::bind_method("los_clear_to",&HexGrid::los_clear_to);
     //los_within_range
     ObjectTypeDB::bind_method("los_within_range",&HexGrid::los_within_range);
@@ -450,7 +576,7 @@ void HexGrid::_bind_methods() {
     ObjectTypeDB::bind_method("hexes_at_distance",&HexGrid::hexes_at_distance);
     ObjectTypeDB::bind_method("hexes_within_distance",&HexGrid::hexes_within_distance);
 
-    //This I'm not sure it needs to be given to GDscript
-    ObjectTypeDB::bind_method("get_directions",&HexGrid::get_directions);
+    ObjectTypeDB::bind_method("astar_get_path_to",&HexGrid::astar_get_path_to);
+    ObjectTypeDB::bind_method("astar_grid_setup",&HexGrid::astar_grid_setup);
 
 }

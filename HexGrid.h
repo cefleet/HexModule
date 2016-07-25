@@ -12,8 +12,11 @@ class HexGrid : public Node {
 	Array hex_directions;
 	String grid_layout;
 	Dictionary _grid_layout;
+
+	Array astar_grid;
 	Array hex_map;
-	//Dictionary layout_types;
+
+	//these may be a waste
 	Dictionary layout_pointy;//orientations
 	Dictionary layout_flat;//orientaions
 
@@ -51,7 +54,6 @@ public:
 	Array hexes_within_distance(Vector3 hex,int dist);
 
 	bool line_intersect_hex(Vector3 hex,Vector2 lStart, Vector2 lEnd);
-	//internal only ... maybeshould make private? IDK
 	bool lines_intersect(Vector2 l1Start,Vector2 l1End, Vector2 l2Start, Vector2 l2End);
 	bool los_clear_to(Vector3 start, Vector3 finish,Array obstacles);
 	Array los_within_range(Vector3 hex,int dist, Array obstacles, Array checkList);
@@ -59,16 +61,17 @@ public:
 	void set_hex_size(Vector2 size_);
 	void set_origin(Vector2 origin_);
 	Array get_map();
-//	int return_hex();
 
-//	Hex hex_add(Hex a, Hex b);
 	void set_layout(String layout);
   void set_rows(int r);
   void set_cols(int c);
 	void set_rows_and_cols(int c, int r);
   int get_values();
-	Array get_directions();
 
+	Array astar_get_path_to(Vector3 startHex, Vector3 endHex, Array obstacles, int dist);
+	void astar_grid_setup(Array obstacles, Array rangeList);
+	void _astar_reset_Nhex(int index);
+	Dictionary _astar_gridify_hex(Vector3 hex);
   HexGrid();
 };
 
