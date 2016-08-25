@@ -72,6 +72,7 @@ public:
 	void astar_grid_setup(Array obstacles, Array rangeList);
 	void _astar_reset_Nhex(int index);
 	Dictionary _astar_gridify_hex(Vector3 hex);
+	Dictionary _astar_get_grid_item_from_id(Vector3 hex);
   HexGrid();
 };
 

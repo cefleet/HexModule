@@ -373,6 +373,7 @@ void HexGrid::createMap(){
 }
 
 void HexGrid::makePointyMap(){
+  hex_map.clear();
   for(int r = 0; r<rows; r++){
     double r_offset = floor(r/2);
     for(int q = -1*(r_offset); q < cols-r_offset; q++){
@@ -390,6 +391,7 @@ void HexGrid::makePointyMap(){
 }
 
 void HexGrid::makeFlatMap(){
+  hex_map.clear();
   for(int q = 0; q<cols; q++){
     double q_offset = floor(q/2);
     for(int r = -1*(q_offset); r < rows-q_offset; r++){
@@ -418,74 +420,115 @@ Array HexGrid::astar_get_path_to(Vector3 startHex, Vector3 endHex, Array obstacl
   Dictionary currentNode;
   Dictionary curr;
   Dictionary neighbor;
+  Dictionary nei;
   Array neighbors;
   Array openList;
   Array closedList;
   Array ret;
-  int n;
+//  int n;
   int gScore;
   bool gScoreIsBest;
   bool isClosed;
   bool isObstacle;
   bool visited;
+  bool nFound;
+
+  Dictionary tN;
+  Dictionary lTN;
 
   for(int i = 0; i < astar_grid.size(); i++){
     _astar_reset_Nhex(i);
   }
 
+  for(int i = 0; i < astar_grid.size(); i++){
+    Dictionary agi = astar_grid[i];
+    if(agi["id"] == startHex){
+        openList.push_back(agi["id"]);
+    }
+  }
 
-
-  openList.push_back(startHex);
-
+  int its = 0;
   while(openList.size() > 0){
+    its +=1;
+
+    //TODO maybe the low index changes is causing a problem
     lowInd = 0;
     for(int i = 0; i < openList.size(); i++){
-      if(openList[i]["f"] < openList[lowInd]["f"]){
+      tN = _astar_get_grid_item_from_id(openList[i]);
+      lTN = _astar_get_grid_item_from_id(openList[lowInd]);
+
+      if(tN["f"] < lTN["f"]){
         lowInd = i;
       }
     }
-    currentNode = openList[lowInd];
+    lTN = _astar_get_grid_item_from_id(openList[lowInd]);
+
+    currentNode = lTN;
+
+
     if(currentNode["id"] == endHex){
-      while(curr["parent"]){
+
+      while(curr["hasParent"]){
+
+        ret.push_back("I am going to loos it");
+        return ret;
+
         ret.push_back(curr);
-        curr = curr["parent"];
+        curr = _astar_get_grid_item_from_id(currentNode["parent"]);
+      //  return ret;
       }
+
       //i may need to invert the path here
       return ret;
     }
+
     openList.remove(lowInd);
+    ret.push_back(openList.size());
+    if(its > 50){
+      return ret;
+    }
+
     currentNode["closed"] = true;
     neighbors = currentNode["neighbors"];
+
+    nFound = false;
     for(int i = 0; i < neighbors.size(); i++){
-      //this could error out possibly
-      n = astar_grid.find(neighbors[i]);
-      if(n > -1){
-        neighbor = astar_grid[n];
+
+      neighbor = _astar_get_grid_item_from_id(neighbors[i]);
+      if(neighbor["found"]){
+        nFound = true;
+      }
+
+      if(nFound == true){
         isClosed = neighbor["closed"];
         isObstacle = neighbor["isObstacle"];
         visited = neighbor["visited"];
 
-        if(neighbor.size() > 2 && isClosed == false && isObstacle == false ){
-          gScore = float(currentNode["g"]) + 1;
+        if(neighbor.size() >=1 && isClosed == false && isObstacle == false ){
+          gScore = int(currentNode["g"]) + 1;
           gScoreIsBest = false;
           if(visited == false){
               gScoreIsBest = true;
               neighbor["h"] = hex_distance(neighbor["id"], endHex);
               neighbor["visited"] = true;
-              openList.push_back(neighbor);
-          } else if (gScore < double(neighbor["g"])){
+
+              openList.push_back(neighbor["id"]);
+
+          } else if(gScore < int(neighbor["g"])){
             gScoreIsBest = true;
           }
 
           if(gScoreIsBest){
-            neighbor["parent"] = currentNode;
+
+            neighbor["parent"] = currentNode["id"];
+            neighbor["hasParent"] = true;
             neighbor["g"] = gScore;
             neighbor["f"] = double(neighbor["g"])+double(neighbor["h"]);
+
           }
         }
       }
     }
-
   }
 
   return ret;
@@ -514,11 +557,24 @@ void HexGrid::_astar_reset_Nhex(int index){
 	i["h"] = 0;
 	i["debug"] = "";
 	i["parent"] = false;
+  i["hasParent"] = false;
 	i["closed"] = false;
 	i["visited"] = false;
+  i["found"] = true;
 
   astar_grid[index] = i;
+}
 
+Dictionary HexGrid::_astar_get_grid_item_from_id(Vector3 hex){
+  Dictionary t;
+  for(int i = 0; i < astar_grid.size(); i++){
+    t = astar_grid[i];
+    if(t["id"] == hex){
+        return t;
+    }
+  }
+  t["found"] = false;
+  return t;
 }
 
 Dictionary HexGrid::_astar_gridify_hex(Vector3 hex){
@@ -534,10 +590,12 @@ Dictionary HexGrid::_astar_gridify_hex(Vector3 hex){
 		nHex["g"] = 0;
 		nHex["h"] = 0;
 	//	nHex.debug = ""
-		nHex["parent"] = 0;
+		nHex["parent"] = false;
+    nHex["hasParent"] = false;
 		nHex["isObstacle"] = false;
 		nHex["closed"] = false;
 		nHex["visited"] = false;
+    nHex["found"] = true;
   }
   return nHex;
 }
