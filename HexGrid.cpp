@@ -437,7 +437,7 @@ Array HexGrid::astar_get_path_to(Vector3 startHex, Vector3 endHex, Array obstacl
   Dictionary lTN;
 
   for(int i = 0; i < astar_grid.size(); i++){
-    _astar_reset_Nhex(i);
+    _astar_reset_Nhex(i,obstacles);
   }
 
   for(int i = 0; i < astar_grid.size(); i++){
@@ -538,6 +538,9 @@ Array HexGrid::astar_get_path_to(Vector3 startHex, Vector3 endHex, Array obstacl
 //the ranglist is a list of all the tiles or the possible tiles to get to
 void HexGrid::astar_grid_setup(Array obstacles, Array rangeList){
     astar_grid.clear();
+	if(rangeList.size() == 0){
+		rangeList == hex_map;
+	}
     for (int i=0; i < rangeList.size(); i++){
       Dictionary nHex = _astar_gridify_hex(rangeList[i]);
 			for(int o = 0; o < obstacles.size(); o++){
@@ -549,20 +552,25 @@ void HexGrid::astar_grid_setup(Array obstacles, Array rangeList){
     }
 }
 
-void HexGrid::_astar_reset_Nhex(int index){
+void HexGrid::_astar_reset_Nhex(int index,Array obstacles){
   //this is probably wrong ... I should be using pointers or something
-  Dictionary i = astar_grid[index];
-  i["f"] = 0;
-  i["g"] = 0;
+  	Dictionary i = astar_grid[index];
+  	i["f"] = 0;
+	i["g"] = 0;
 	i["h"] = 0;
 	i["debug"] = "";
 	i["parent"] = false;
-  i["hasParent"] = false;
+  	i["hasParent"] = false;
 	i["closed"] = false;
 	i["visited"] = false;
-  i["found"] = true;
+  	i["found"] = true;
 
-  astar_grid[index] = i;
+	for(int o = 0; o < obstacles.size(); o++){
+        if (obstacles[o] == i["id"]){
+          i["isObstacle"] = true;
+        }
+	}
+  	astar_grid[index] = i;
 }
 
 Dictionary HexGrid::_astar_get_grid_item_from_id(Vector3 hex){

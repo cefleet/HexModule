@@ -70,7 +70,7 @@ public:
 
 	Array astar_get_path_to(Vector3 startHex, Vector3 endHex, Array obstacles, int dist);
 	void astar_grid_setup(Array obstacles, Array rangeList);
-	void _astar_reset_Nhex(int index);
+	void _astar_reset_Nhex(int index, Array obstacles);
 	Dictionary _astar_gridify_hex(Vector3 hex);
 	Dictionary _astar_get_grid_item_from_id(Vector3 hex);
   HexGrid();
