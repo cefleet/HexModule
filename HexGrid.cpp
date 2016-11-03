@@ -415,6 +415,27 @@ Array HexGrid::get_map(){
   return hex_map;
 }
 
+Array HexGrid::hexes_outlined(Array hexList){
+	Array lines;
+
+  for(int i = 0; i < hexList.size(); i++){
+    Array hEdges = hex_edges(hexList[i]);
+    Array neighs =  hex_neighbors(hexList[i]);
+    neighs.invert();
+    int _i = 5;
+    while(_i >= 0){
+      if(hexList.find(neighs[_i]) > -1){
+        hEdges.remove(_i);
+      }
+      _i--;
+    }
+    for(int e = 0; e < hEdges.size(); e++){
+      lines.append(hEdges[e]);
+    }
+  }
+  return lines;
+}
+
 Array HexGrid::astar_get_path_to(Vector3 startHex, Vector3 endHex, Array obstacles, int dist){
   int lowInd = 0;
   Dictionary currentNode;
@@ -443,7 +464,7 @@ Array HexGrid::astar_get_path_to(Vector3 startHex, Vector3 endHex, Array obstacl
   for(int i = 0; i < astar_grid.size(); i++){
     Dictionary agi = astar_grid[i];
     if(agi["id"] == startHex){
-        openList.push_back(agi["id"]);
+      openList.push_back(agi["id"]);
     }
   }
 
@@ -479,12 +500,14 @@ Array HexGrid::astar_get_path_to(Vector3 startHex, Vector3 endHex, Array obstacl
       }
 
       //i may need to invert the path here
+      ret.push_back("Im returning it at line 482");
       return ret;
     }
 
     openList.remove(lowInd);
     ret.push_back(openList.size());
     if(its > 50){
+      ret.push_back("it is greater than 50");
       return ret;
     }
 
@@ -530,26 +553,29 @@ Array HexGrid::astar_get_path_to(Vector3 startHex, Vector3 endHex, Array obstacl
       }
     }
   }
-
+  //ret.push_back(endHex);
+  //ret.push_back(startHex);
+//  ret.push_back(its);
   return ret;
 
 }
 
 //the ranglist is a list of all the tiles or the possible tiles to get to
-void HexGrid::astar_grid_setup(Array obstacles, Array rangeList){
-    astar_grid.clear();
+Array HexGrid::astar_grid_setup(Array obstacles, Array rangeList){
+  astar_grid.clear();
 	if(rangeList.size() == 0){
 		rangeList == hex_map;
 	}
-    for (int i=0; i < rangeList.size(); i++){
-      Dictionary nHex = _astar_gridify_hex(rangeList[i]);
-			for(int o = 0; o < obstacles.size(); o++){
-        if (obstacles[o] == nHex){
-          nHex["isObstacle"] = true;
-        }
+  for (int i=0; i < rangeList.size(); i++){
+    Dictionary nHex = _astar_gridify_hex(rangeList[i]);
+		for(int o = 0; o < obstacles.size(); o++){
+      if (obstacles[o] == nHex){
+        nHex["isObstacle"] = true;
       }
-      astar_grid.push_back(nHex);
     }
+    astar_grid.push_back(nHex);
+  }
+  return astar_grid;
 }
 
 void HexGrid::_astar_reset_Nhex(int index,Array obstacles){
@@ -641,8 +667,9 @@ void HexGrid::_bind_methods() {
 
     ObjectTypeDB::bind_method("hexes_at_distance",&HexGrid::hexes_at_distance);
     ObjectTypeDB::bind_method("hexes_within_distance",&HexGrid::hexes_within_distance);
+    ObjectTypeDB::bind_method("hexes_outlined",&HexGrid::hexes_outlined);
 
-    ObjectTypeDB::bind_method("astar_get_path_to",&HexGrid::astar_get_path_to);
-    ObjectTypeDB::bind_method("astar_grid_setup",&HexGrid::astar_grid_setup);
+  //  ObjectTypeDB::bind_method("astar_get_path_to",&HexGrid::astar_get_path_to);
+  //  ObjectTypeDB::bind_method("astar_grid_setup",&HexGrid::astar_grid_setup);
 
 }

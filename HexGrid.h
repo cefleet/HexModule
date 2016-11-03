@@ -50,8 +50,11 @@ public:
 	Vector2 hex_corner_offset(int corner);
 	Array hex_corners(Vector3 h);
 	Array hex_edges(Vector3 hex);
+
 	Array hexes_at_distance(Vector3 hex,int dist);
 	Array hexes_within_distance(Vector3 hex,int dist);
+
+	Array hexes_outlined(Array hexList);
 
 	bool line_intersect_hex(Vector3 hex,Vector2 lStart, Vector2 lEnd);
 	bool lines_intersect(Vector2 l1Start,Vector2 l1End, Vector2 l2Start, Vector2 l2End);
@@ -69,7 +72,7 @@ public:
   int get_values();
 
 	Array astar_get_path_to(Vector3 startHex, Vector3 endHex, Array obstacles, int dist);
-	void astar_grid_setup(Array obstacles, Array rangeList);
+	Array astar_grid_setup(Array obstacles, Array rangeList);
 	void _astar_reset_Nhex(int index, Array obstacles);
 	Dictionary _astar_gridify_hex(Vector3 hex);
 	Dictionary _astar_get_grid_item_from_id(Vector3 hex);
