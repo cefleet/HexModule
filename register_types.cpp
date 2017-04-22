@@ -1,10 +1,10 @@
 #include "register_types.h"
-#include "object_type_db.h"
+#include "class_db.h"
 #include "HexGrid.h"
 
 void register_hex_types() {
 
-        ObjectTypeDB::register_type<HexGrid>();
+        ClassDB::register_class<HexGrid>();
       //  ObjectTypeDB::register_type<Hex>();
 }
 
