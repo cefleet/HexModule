@@ -3,7 +3,7 @@
 #include "scene/main/node.h"
 
 class HexGrid : public Node {
-	OBJ_TYPE(HexGrid,Node);
+	GDCLASS(HexGrid,Node);
   int cols;
   int rows;
 	Vector2 size;

@@ -635,41 +635,40 @@ Dictionary HexGrid::_astar_gridify_hex(Vector3 hex){
 }
 
 void HexGrid::_bind_methods() {
-    ObjectTypeDB::bind_method("set_rows",&HexGrid::set_rows);
-    ObjectTypeDB::bind_method("set_cols",&HexGrid::set_cols);
-    ObjectTypeDB::bind_method("set_layout",&HexGrid::set_layout);
+    ClassDB::bind_method("set_rows",&HexGrid::set_rows);
+    ClassDB::bind_method("set_cols",&HexGrid::set_cols);
+    ClassDB::bind_method("set_layout",&HexGrid::set_layout);
 
-    ObjectTypeDB::bind_method("hex",&HexGrid::hex);
-    ObjectTypeDB::bind_method("point",&HexGrid::point);
-    ObjectTypeDB::bind_method("hex_add",&HexGrid::hex_add);
-    ObjectTypeDB::bind_method("hex_subtract",&HexGrid::hex_subtract);
-    ObjectTypeDB::bind_method("hex_scale",&HexGrid::hex_scale);
-    ObjectTypeDB::bind_method("hex_distance",&HexGrid::hex_distance);
-    ObjectTypeDB::bind_method("hex_neighbor",&HexGrid::hex_neighbor);
-    ObjectTypeDB::bind_method("hex_neighbors",&HexGrid::hex_neighbors);
-    ObjectTypeDB::bind_method("hex_round",&HexGrid::hex_round);
-    ObjectTypeDB::bind_method("hex_linedraw",&HexGrid::hex_linedraw);
-    ObjectTypeDB::bind_method("set_hex_size",&HexGrid::set_hex_size);
-    ObjectTypeDB::bind_method("set_origin",&HexGrid::set_origin);
+    ClassDB::bind_method("hex",&HexGrid::hex);
+    ClassDB::bind_method("point",&HexGrid::point);
+    ClassDB::bind_method("hex_add",&HexGrid::hex_add);
+    ClassDB::bind_method("hex_subtract",&HexGrid::hex_subtract);
+    ClassDB::bind_method("hex_scale",&HexGrid::hex_scale);
+    ClassDB::bind_method("hex_distance",&HexGrid::hex_distance);
+    ClassDB::bind_method("hex_neighbor",&HexGrid::hex_neighbor);
+    ClassDB::bind_method("hex_neighbors",&HexGrid::hex_neighbors);
+    ClassDB::bind_method("hex_round",&HexGrid::hex_round);
+    ClassDB::bind_method("hex_linedraw",&HexGrid::hex_linedraw);
+    ClassDB::bind_method("set_hex_size",&HexGrid::set_hex_size);
+    ClassDB::bind_method("set_origin",&HexGrid::set_origin);
 
-    ObjectTypeDB::bind_method("hex_to_point",&HexGrid::hex_to_point);
-    ObjectTypeDB::bind_method("point_to_hex",&HexGrid::point_to_hex);
-    ObjectTypeDB::bind_method("hex_corners",&HexGrid::hex_corners);
-    ObjectTypeDB::bind_method("hex_edges",&HexGrid::hex_edges);
+    ClassDB::bind_method("hex_to_point",&HexGrid::hex_to_point);
+    ClassDB::bind_method("point_to_hex",&HexGrid::point_to_hex);
+    ClassDB::bind_method("hex_corners",&HexGrid::hex_corners);
+    ClassDB::bind_method("hex_edges",&HexGrid::hex_edges);
 
-    ObjectTypeDB::bind_method("get_map",&HexGrid::get_map);
+    ClassDB::bind_method("get_map",&HexGrid::get_map);
 
-    ObjectTypeDB::bind_method("line_intersect_hex",&HexGrid::line_intersect_hex);
-    ObjectTypeDB::bind_method("lines_intersect",&HexGrid::lines_intersect);
-    ObjectTypeDB::bind_method("los_clear_to",&HexGrid::los_clear_to);
+    ClassDB::bind_method("line_intersect_hex",&HexGrid::line_intersect_hex);
+    ClassDB::bind_method("lines_intersect",&HexGrid::lines_intersect);
+    ClassDB::bind_method("los_clear_to",&HexGrid::los_clear_to);
     //los_within_range
-    ObjectTypeDB::bind_method("los_within_range",&HexGrid::los_within_range);
+    ClassDB::bind_method("los_within_range",&HexGrid::los_within_range);
 
-    ObjectTypeDB::bind_method("hexes_at_distance",&HexGrid::hexes_at_distance);
-    ObjectTypeDB::bind_method("hexes_within_distance",&HexGrid::hexes_within_distance);
-    ObjectTypeDB::bind_method("hexes_outlined",&HexGrid::hexes_outlined);
+    ClassDB::bind_method("hexes_at_distance",&HexGrid::hexes_at_distance);
+    ClassDB::bind_method("hexes_within_distance",&HexGrid::hexes_within_distance);
+    ClassDB::bind_method("hexes_outlined",&HexGrid::hexes_outlined);
 
-  //  ObjectTypeDB::bind_method("astar_get_path_to",&HexGrid::astar_get_path_to);
-  //  ObjectTypeDB::bind_method("astar_grid_setup",&HexGrid::astar_grid_setup);
-
+  //  ClassDB::bind_method("astar_get_path_to",&HexGrid::astar_get_path_to);
+  //  ClassDB::bind_method("astar_grid_setup",&HexGrid::astar_grid_setup);
 }
