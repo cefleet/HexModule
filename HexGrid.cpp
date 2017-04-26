@@ -1,4 +1,5 @@
 #include "HexGrid.h"
+#define _USE_MATH_DEFINES
 #include <cmath>
 #include <algorithm>
 using std::abs;
@@ -172,7 +173,7 @@ Vector3 HexGrid::hex_round(Vector3 h)
     double q_diff = abs(q - h.x);
     double r_diff = abs(r - h.y);
     double s_diff = abs(s - h.z);
-    if (q_diff > r_diff and q_diff > s_diff)
+    if (q_diff > r_diff && q_diff > s_diff)
     {
         q = -r - s;
     }
